@@ -6,6 +6,8 @@ import {
   writeFile,
 } from "node:fs/promises";
 
+import { fileURLToPath } from "node:url";
+
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -24,17 +26,26 @@ const EMPTY_DATABASE: Database = {
   tasks: [],
 };
 
+const PROJECT_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  ".."
+);
+
+const DATA_DIRECTORY =
+  process.env.TASKPILOT_DATA_DIR
+    ? path.resolve(process.env.TASKPILOT_DATA_DIR)
+    : path.join(PROJECT_ROOT, "data");
+
 export class TaskStore {
   private readonly filePath: string;
 
   constructor(
-    filePath = path.resolve(
-      process.cwd(),
-      "data",
-      "taskpilot.json"
+  filePath = path.join(
+    DATA_DIRECTORY,
+    "taskpilot.json"
     )
   ) {
-    this.filePath = filePath;
+  this.filePath = filePath;
   }
 
   private async readDatabase(): Promise<Database> {
